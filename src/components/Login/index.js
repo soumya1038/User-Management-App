@@ -33,7 +33,7 @@ class Login extends Component {
     this.setState({ errorMessage: '' })
     const { email, password } = this.state
     try {
-      const response = await fetch('http://localhost:5009/login', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5009'}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ class Login extends Component {
     this.setState({ errorMessage: '', successMessage: '' })
     const { name, email, password } = this.state
     try {
-      const response = await fetch('http://localhost:5009/users', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5009'}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

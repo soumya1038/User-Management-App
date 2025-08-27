@@ -87,4 +87,6 @@ def login():
         return jsonify({"status": "failed"}), 401
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5009, debug=True)
+    import os
+    port = int(os.environ.get('PORT', 5009))
+    app.run(host='0.0.0.0', port=port, debug=False)
