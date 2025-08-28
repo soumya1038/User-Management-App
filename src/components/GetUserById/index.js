@@ -1,7 +1,9 @@
 
 import { Component } from 'react'
+import { API } from '../../api'
 import { Navigate } from 'react-router-dom'
 import Header from '../Header'
+
 
 class GetUserById extends Component {
   state = {
@@ -22,7 +24,7 @@ class GetUserById extends Component {
   fetchUser = async () => {
     const { userId } = this.state
     try {
-      const response = await fetch(`http://localhost:5009/user/${userId}`)
+      const response = await fetch(`${API}/user/${userId}`)
       if (!response.ok) {
         throw new Error('User not found')
       }
@@ -43,9 +45,7 @@ class GetUserById extends Component {
 handleDelete = async () => {
   const { userId } = this.state
   try {
-    const response = await fetch(`http://localhost:5009/user/${userId}`, {
-      method: 'DELETE',
-    })
+    const response = await fetch(`${API}/user/${userId}`, { method: 'DELETE' })
     if (response.ok) {
       alert('User deleted successfully!')
       // Simulate logout
@@ -66,8 +66,7 @@ handleDelete = async () => {
   handleUpdate = async () => {
     const { userId, name, email } = this.state
     try {
-      const response = await fetch(`http://localhost:5009/user/${userId}`, {
-        method: 'PUT',
+      const response = await fetch(`${API}/user/${userId}`, { method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },

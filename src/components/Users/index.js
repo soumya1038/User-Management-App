@@ -1,6 +1,8 @@
 
 import React, { Component } from 'react'
 import Header from '../Header'
+import { API } from '../../api'
+
 
 class Users extends Component {
   constructor(props) {
@@ -22,7 +24,7 @@ class Users extends Component {
 
   fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5009/users')
+      const response = await fetch(`${API}/users`)
       if (!response.ok) {
         throw new Error('Failed to fetch users')
       }

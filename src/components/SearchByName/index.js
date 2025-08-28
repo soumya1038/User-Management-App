@@ -2,6 +2,8 @@
 import { Component } from 'react'
 import { Navigate } from 'react-router-dom'
 import Header from '../Header'
+import { API } from '../../api'
+
 
 class SearchByName extends Component {
   state = {
@@ -22,7 +24,7 @@ class SearchByName extends Component {
   searchUsers = async () => {
     const { searchName } = this.state
     try {
-      const response = await fetch(`http://localhost:5009/search?name=${searchName}`)
+      const response = await fetch(`${API}/search?name=${encodeURIComponent(searchName)}`)
       if (!response.ok) {
         throw new Error('No users found')
       }
@@ -38,9 +40,7 @@ class SearchByName extends Component {
 
   handleDelete = async userId => {
     try {
-      const response = await fetch(`http://localhost:5009/user/${userId}`, {
-        method: 'DELETE',
-      })
+      const response = await fetch(`${API}/user/${userId}`, { method: 'DELETE' })
       if (response.ok) {
         alert('User deleted successfully!')
         localStorage.removeItem('jwt_token')
@@ -65,8 +65,7 @@ class SearchByName extends Component {
   handleUpdate = async userId => {
     const { editedName, editedEmail } = this.state
     try {
-      const response = await fetch(`http://localhost:5009/user/${userId}`, {
-        method: 'PUT',
+      const response = await fetch(`${API}/user/${userId}`, { method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },

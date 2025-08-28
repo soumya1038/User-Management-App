@@ -1,6 +1,8 @@
 
 import React, { Component } from 'react'
 import { Navigate } from 'react-router-dom'
+import { API } from '../../api'
+
 
 class Login extends Component {
   constructor(props) {
@@ -33,7 +35,7 @@ class Login extends Component {
     this.setState({ errorMessage: '' })
     const { email, password } = this.state
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5009'}/login`, {
+      const response = await fetch(`${API}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +62,7 @@ class Login extends Component {
     this.setState({ errorMessage: '', successMessage: '' })
     const { name, email, password } = this.state
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5009'}/users`, {
+      const response = await fetch(`${API}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

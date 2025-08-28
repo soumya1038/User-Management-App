@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import sqlite3
-import json
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -8,6 +7,17 @@ CORS(app)
 
 conn = sqlite3.connect('users.db', check_same_thread=False)
 cursor = conn.cursor()
+
+# Ensure table exists with UNIQUE email
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+)
+''')
+conn.commit()
 
 @app.route('/')
 def home():
@@ -35,17 +45,27 @@ def get_user(user_id):
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    data = request.get_json()
-    name = data['name']
-    email = data['email']
-    password = data['password']
-    cursor.execute("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", (name, email, password))
-    conn.commit()
-    return jsonify({"message": "User created successfully!"}), 201
+    data = request.get_json(silent=True) or {}
+    name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
+
+    if not name or not email or not password:
+        return jsonify({"error": "Missing fields"}), 400
+
+    try:
+        cursor.execute(
+            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+            (name, email, password)
+        )
+        conn.commit()
+        return jsonify({"message": "User created successfully!"}), 201
+    except sqlite3.IntegrityError:
+        return jsonify({"error": "Email already exists"}), 409
 
 @app.route('/user/<user_id>', methods=['PUT'])
 def update_user(user_id):
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     name = data.get('name')
     email = data.get('email')
     if name and email:
@@ -76,17 +96,21 @@ def search_users():
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    email = data['email']
-    password = data['password']
+    data = request.get_json(silent=True) or {}
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({"status": "failed", "error": "Invalid request"}), 400
+
     cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
     user = cursor.fetchone()
     if user:
         return jsonify({"status": "success", "user_id": user[0]})
     else:
-        return jsonify({"status": "failed"}), 401
+        return jsonify({"status": "failed", "error": "Invalid credentials"}), 401
 
 if __name__ == '__main__':
     import os
-    port = int(os.environ.get('PORT', 5009))
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
